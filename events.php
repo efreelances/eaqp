@@ -124,9 +124,13 @@ SLIDER SECTION (dynamic from DB + Theme Colors)
 </section>
 
 
-<section>
-    hola
+
+<section class="section-padding" id="backtohome">
+    <div>
+        hola
+    </div>
 </section>
+
 
 
 <!-- ============================================
