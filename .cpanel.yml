@@ -1,0 +1,18 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/elitearequipa/public_html/
+    - /bin/cp -R admin $DEPLOYPATH
+    - /bin/cp -R lang $DEPLOYPATH
+    - /bin/cp -R uploads $DEPLOYPATH
+    - /bin/cp index.php $DEPLOYPATH
+    - /bin/cp events.php $DEPLOYPATH
+    - /bin/cp header.php $DEPLOYPATH
+    - /bin/cp footer.php $DEPLOYPATH
+    - /bin/cp config.php $DEPLOYPATH
+    - /bin/cp style.css $DEPLOYPATH
+    - /bin/cp script.js $DEPLOYPATH
+    - /bin/cp search.php $DEPLOYPATH
+    - /bin/cp elite-dorado.png $DEPLOYPATH
+    - /bin/cp logo-copa.png $DEPLOYPATH
+    - /bin/cp logo-e.png $DEPLOYPATH
