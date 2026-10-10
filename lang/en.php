@@ -107,4 +107,27 @@ return [
     'status' => 'Status',
     'active' => 'Active',
     'inactive' => 'Inactive',
+
+    // events.php
+    'artists_tbc' => 'Artists to be confirmed',
+    'location' => 'Location',
+    'date' => 'Date',
+    'time' => 'Time',
+    'about_event' => 'Event Details',
+    'view_map' => 'View on Map',
+    'ticket_prices' => 'Ticket Prices',
+    'select' => 'Select',
+    'sale_starts' => 'Sale starts on',
+    'upcoming_events' => 'Upcoming Events',
+    'tickets_from' => 'Tickets from',
+    'know_more' => 'Know more',
+
+    'search_results' => 'Search Results',
+    'searching_for' => 'Searching for',
+    'no_results' => 'No results found',
+    'try_different_search' => 'Try a different search term',
+    'back_home' => 'Back to home',
+    'enter_search_term' => 'Enter a search term',
+    'use_search_bar' => 'Use the search bar in the menu to find events',
+
 ];

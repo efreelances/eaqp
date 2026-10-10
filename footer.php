@@ -17,7 +17,7 @@ $social_media = get_social_media($pdo);
 <div class="container footer-container">
     <!-- SECCIÓN 1: Logo y redes sociales -->
     <div class="footer-section">
-        <img src="logo-e.png" width="30" alt="Logo">    
+        <img src="elite-dorado.png" width="80" alt="Logo">    
         <!--<h3><?php echo htmlspecialchars($logo_text); ?><span><?php echo htmlspecialchars($logo_highlight); ?></span></h3>-->
         <p><?php echo htmlspecialchars($tagline); ?></p>
         

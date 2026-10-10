@@ -32,17 +32,94 @@ $current_lang = get_current_lang();
 <style id="dynamic-theme"><?php echo $theme_css; ?></style>
 </head>
 <body>
+
+
+<!-- ============================================
+     LOADER CON IMAGEN Y PORCENTAJE
+     ============================================ -->
+<div id="page-loader" class="page-loader">
+    <div class="loader-container">
+        <!-- Círculos decorativos -->
+        <div class="loader-circle"></div>
+        <div class="loader-circle-inner"></div>
+        
+        <!-- Logo/Imagen central -->
+        <div class="loader-image">
+            <img src="logo-copa.png" alt="Élite Arequipa">
+        </div>
+        
+        <!-- Porcentaje de carga -->
+        <div class="loader-percentage">
+            <!--<span id="loader-text">0%</span>-->
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    const loader = document.getElementById('page-loader');
+    const percentageText = document.getElementById('loader-text');
+    
+    if (!loader) return;
+    
+    // Animación del porcentaje
+    let percentage = 0;
+    const interval = setInterval(function() {
+        // Aumentar porcentaje de forma realista (más lento al inicio, más rápido después)
+        if (percentage < 30) {
+            percentage += 1;
+        } else if (percentage < 70) {
+            percentage += 2;
+        } else if (percentage < 90) {
+            percentage += 3;
+        } else {
+            percentage += 5;
+        }
+        
+        // Actualizar texto
+        if (percentageText) {
+            percentageText.textContent = percentage + '%';
+        }
+        
+        // Cuando llegue a 100%, ocultar loader
+        if (percentage >= 100) {
+            clearInterval(interval);
+            
+            setTimeout(function() {
+                loader.style.opacity = '0';
+                setTimeout(function() {
+                    loader.style.display = 'none';
+                }, 500);
+            }, 300); // Pequeña pausa en 100%
+        }
+    }, 30); // Actualizar cada 30ms
+    
+    // Timeout de seguridad (máximo 4 segundos)
+    setTimeout(function() {
+        if (percentageText) percentageText.textContent = '100%';
+        setTimeout(function() {
+            loader.style.opacity = '0';
+            setTimeout(function() {
+                loader.style.display = 'none';
+            }, 500);
+        }, 300);
+    }, 4000);
+})();
+</script>
+
+
+
 <header class="main-header">
 <div class="container header-container">
     <!-- 1. LOGO (fijo a la izquierda) -->
     <div class="logo">
-        <a href="https://elitearequipa.com" title="Elite - Discotecas 2026"><img src="elite-dorado.png" width="80" alt="Logo"></a>
+        <a href="index.php" title="Elite - Discotecas 2026"><img src="elite-dorado.png" width="80" alt="Logo"></a>
     </div>
     
     <!-- 2. BARRA DE BÚSQUEDA (ocupa todo el espacio disponible) -->
     <div class="search-bar">
-        <form>
-            <input type="text" placeholder="<?= t('nav_search') ?>">
+       <form action="search.php" method="GET">
+            <input type="text" name="q" placeholder="<?= t('nav_search') ?>" required>
             <button type="submit"><i class="fas fa-search"></i></button>
         </form>
     </div>
@@ -50,8 +127,8 @@ $current_lang = get_current_lang();
     <!-- 3. MENÚ (fijo a la derecha) -->
     <nav class="main-nav">
         <ul>
-            <li><a href="#home"><?= t('nav_home') ?></a></li>
-            <li><a href="#proximos"><?= t('nav_events') ?></a></li>
+            <li><a href="index.php"><?= t('nav_home') ?></a></li>
+            <li><a href="#">Ubicanos</a></li>
         </ul>
     </nav>
     

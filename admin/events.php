@@ -1,6 +1,6 @@
 <?php
 require_once 'auth.php';
-require_once 'translate_helper.php'; // Agregar esta línea 
+require_once 'translate_helper.php'; 
 require_login();
 $lang = admin_lang();
 $message = '';
@@ -9,13 +9,14 @@ $action = $_GET['action'] ?? 'list';
 // ============================================
 // HANDLE ACTIONS
 // ============================================
-// Eliminar evento
 if (isset($_GET['delete'])) {
-    $pdo->prepare("DELETE FROM events WHERE id=?")->execute([(int)$_GET['delete']]);
+    $eventId = (int)$_GET['delete'];
+    // Eliminar sliders asociados primero (aunque ON DELETE CASCADE lo hace, es buena práctica)
+    $pdo->prepare("DELETE FROM event_sliders WHERE event_id=?")->execute([$eventId]);
+    $pdo->prepare("DELETE FROM events WHERE id=?")->execute([$eventId]);
     $message = at('deleted_success');
 }
 
-// Toggle destacado rápido
 if (isset($_GET['toggle_featured'])) {
     $id = (int)$_GET['toggle_featured'];
     $pdo->prepare("UPDATE events SET is_featured = NOT is_featured WHERE id=?")->execute([$id]);
@@ -37,26 +38,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'is_active' => isset($_POST['is_active']) ? 1 : 0,
     ];
     
-    //  TRADUCCIÓN AUTOMÁTICA AL INGLÉS
     $data['title_en'] = auto_translate($data['title'], 'en');
     $data['description_en'] = auto_translate($data['description'], 'en');
     $data['location_en'] = auto_translate($data['location'], 'en');
     
-    // Upload de imagen
+    // 1. Imagen principal del evento
     if (!empty($_FILES['image']['name'])) {
         $uploadDir = '../uploads/';
         if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
         $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
-        $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-        if (in_array($ext, $allowed)) {
+        if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
             $filename = 'event_' . time() . '.' . $ext;
             move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $filename);
             $data['image_url'] = 'uploads/' . $filename;
         }
     }
     
-    if (!empty($_POST['id'])) {
-        // UPDATE
+    $isUpdate = !empty($_POST['id']);
+    
+    if ($isUpdate) {
         $sql = "UPDATE events SET title=:title, title_en=:title_en, description=:description, 
                 description_en=:description_en, event_date=:event_date, price=:price, 
                 location=:location, location_en=:location_en, capacity=:capacity, 
@@ -65,28 +65,85 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sql .= " WHERE id=:id";
         $data['id'] = $_POST['id'];
         $pdo->prepare($sql)->execute($data);
-        $message = at('updated_success') . ' (Auto-translated to English)';
+        $eventId = $data['id'];
+        $message = at('updated_success') . ' (Auto-translated)';
     } else {
-        // INSERT
         if (!isset($data['image_url'])) $data['image_url'] = 'uploads/default.jpg';
         $pdo->prepare("INSERT INTO events (title, title_en, description, description_en, event_date, 
                       price, location, location_en, capacity, is_featured, is_active, image_url)
                       VALUES (:title, :title_en, :description, :description_en, :event_date, 
                       :price, :location, :location_en, :capacity, :is_featured, :is_active, :image_url)")->execute($data);
-        $message = at('created_success') . ' (Auto-translated to English)';
+        $eventId = $pdo->lastInsertId();
+        $message = at('created_success') . ' (Auto-translated)';
     }
+
+    // 2. PROCESAR SLIDERS DEL EVENTO (1 a 3 imágenes)
+// Eliminamos SOLO los sliders que el usuario quiere reemplazar (los que tienen nuevo archivo)
+for ($i = 1; $i <= 3; $i++) {
+    $fileKey = "slider_image_{$i}";
+    
+    // Si hay un nuevo archivo en esta posición, eliminamos el anterior (si existe)
+    if (!empty($_FILES[$fileKey]['name'])) {
+        $pdo->prepare("DELETE FROM event_sliders WHERE event_id = ? AND sort_order = ?")
+            ->execute([$eventId, $i]);
+    }
+}
+
+// Ahora insertamos/actualizamos las imágenes
+for ($i = 1; $i <= 3; $i++) {
+    $fileKey = "slider_image_{$i}";
+    $themeKey = "slider_theme_{$i}";
+    
+    // Verificar si ya existe un slider en esta posición
+    $existing = $pdo->prepare("SELECT id FROM event_sliders WHERE event_id = ? AND sort_order = ?");
+    $existing->execute([$eventId, $i]);
+    $existingSlide = $existing->fetch();
+    
+    if (!empty($_FILES[$fileKey]['name'])) {
+        // NUEVO ARCHIVO SUBIDO
+        $uploadDir = '../uploads/';
+        $ext = strtolower(pathinfo($_FILES[$fileKey]['name'], PATHINFO_EXTENSION));
+        if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+            $filename = 'event_slide_' . $eventId . '_' . $i . '_' . time() . '.' . $ext;
+            
+            if (move_uploaded_file($_FILES[$fileKey]['tmp_name'], $uploadDir . $filename)) {
+                $imageUrl = 'uploads/' . $filename;
+                $themeId = (int)($_POST[$themeKey] ?? 1);
+                
+                if ($existingSlide) {
+                    // Actualizar existente
+                    $pdo->prepare("UPDATE event_sliders SET image_url = ?, theme_id = ? WHERE id = ?")
+                        ->execute([$imageUrl, $themeId, $existingSlide['id']]);
+                } else {
+                    // Insertar nuevo
+                    $pdo->prepare("INSERT INTO event_sliders (event_id, image_url, theme_id, sort_order) VALUES (?, ?, ?, ?)")
+                        ->execute([$eventId, $imageUrl, $themeId, $i]);
+                }
+            }
+        }
+    }
+    // Si NO hay nuevo archivo pero existe uno guardado, lo mantenemos (no hacemos nada)
+}
+    
     $action = 'list';
 }
 
 // Cargar evento para editar
 $event = null;
+$event_sliders = [];
+$themes = $pdo->query("SELECT id, name FROM themes ORDER BY id ASC")->fetchAll();
+
 if ($action === 'edit' && isset($_GET['id'])) {
     $stmt = $pdo->prepare("SELECT * FROM events WHERE id=?");
     $stmt->execute([(int)$_GET['id']]);
     $event = $stmt->fetch();
+    
+    // Cargar sliders existentes de este evento
+    $stmtSlides = $pdo->prepare("SELECT * FROM event_sliders WHERE event_id = ? ORDER BY sort_order ASC");
+    $stmtSlides->execute([$event['id']]);
+    $event_sliders = $stmtSlides->fetchAll();
 }
 
-// Obtener todos los eventos
 $events = $pdo->query("SELECT * FROM events ORDER BY event_date DESC")->fetchAll();
 ?>
 <!DOCTYPE html>
@@ -96,6 +153,7 @@ $events = $pdo->query("SELECT * FROM events ORDER BY event_date DESC")->fetchAll
 <title><?= at('events') ?> | Elite Admin</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
+/* ... (Mantén todo tu CSS actual aquí, no lo he modificado) ... */
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
 body{background:var(--admin-content-bg,#0a0a0a);color:#fff;display:flex;min-height:100vh;}
 .sidebar{width:250px;background:var(--admin-sidebar-bg,#1a1a1a);border-right:2px solid var(--admin-accent,#d4af37);padding:20px 0;position:fixed;height:100vh;}
@@ -134,6 +192,17 @@ tr:hover{background:#222;}
 .badge-regular{background:#2d2d2d;color:#ccc;}
 .badge-active{background:#2d6b2d;color:#9fff9f;}
 .badge-inactive{background:#6b2d2d;color:#ff9f9f;}
+
+/* Nuevo estilo para sliders en admin */
+.slider-upload-box {
+    background: #0a0a0a;
+    border: 1px dashed #2d2d2d;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+.slider-upload-box h4 { color: var(--admin-accent, #d4af37); margin-bottom: 10px; font-size: 14px; }
+.slider-preview { width: 100%; max-width: 200px; height: 100px; object-fit: cover; border-radius: 6px; margin-bottom: 10px; border: 1px solid #2d2d2d; }
 </style>
 </head>
 <body>
@@ -147,6 +216,7 @@ tr:hover{background:#222;}
     <a href="settings.php"><i class="fas fa-cog"></i> <?= at('settings') ?></a>
     <a href="../index.php" target="_blank"><i class="fas fa-external-link-alt"></i> <?= at('view_site') ?></a>
 </aside>
+
 <div class="main-content">
     <div class="topbar">
         <h1><i class="fas fa-calendar-alt"></i> <?= at('events') ?></h1>
@@ -159,13 +229,13 @@ tr:hover{background:#222;}
     <?php if ($message): ?><div class="message"><?= htmlspecialchars($message) ?></div><?php endif; ?>
     
     <?php if ($action === 'edit' || $action === 'add'): ?>
-    <!-- FORMULARIO: Crear / Editar Evento -->
     <div class="form-card">
         <h2 style="color:var(--admin-accent,#d4af37);margin-bottom:20px;">
             <?= $event ? at('edit') . ' Event' : at('new_event') ?>
         </h2>
         <form method="POST" enctype="multipart/form-data">
             <?php if ($event): ?><input type="hidden" name="id" value="<?= $event['id'] ?>"><?php endif; ?>
+            
             <div class="form-row">
                 <div class="form-group">
                     <label><?= at('title') ?></label>
@@ -176,6 +246,7 @@ tr:hover{background:#222;}
                     <input type="datetime-local" name="event_date" value="<?= $event['event_date'] ?? '' ?>" required>
                 </div>
             </div>
+            
             <div class="form-row">
                 <div class="form-group">
                     <label><?= at('price') ?></label>
@@ -186,23 +257,72 @@ tr:hover{background:#222;}
                     <input type="text" name="location" value="<?= htmlspecialchars($event['location'] ?? 'Elite Venue, Arequipa') ?>">
                 </div>
             </div>
+            
             <div class="form-row">
                 <div class="form-group">
                     <label><?= at('capacity') ?></label>
                     <input type="number" name="capacity" value="<?= $event['capacity'] ?? 0 ?>">
                 </div>
                 <div class="form-group">
-                    <label><?= at('image') ?></label>
+                    <label><?= at('image') ?> (Principal)</label>
                     <input type="file" name="image" accept="image/*">
+                    <?php if ($event && !empty($event['image_url'])): ?>
+                        <img src="../<?= htmlspecialchars($event['image_url']) ?>" class="slider-preview" style="margin-top:10px;">
+                    <?php endif; ?>
                 </div>
             </div>
+            
             <div class="form-group" style="margin-bottom:20px;">
                 <label><?= at('description') ?></label>
                 <textarea name="description"><?= htmlspecialchars($event['description'] ?? '') ?></textarea>
             </div>
             
-            <!-- ⭐ CHECKBOX DESTACAR EVENTO -->
-            <div class="checkbox-row">
+            <!-- ============================================ -->
+            <!-- NUEVA SECCIÓN: SLIDERS DEL EVENTO (1 a 3) -->
+            <!-- ============================================ -->
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #2d2d2d;">
+                <h3 style="color: var(--admin-accent, #d4af37); margin-bottom: 15px;">
+                    <i class="fas fa-images"></i> Slider del Evento (Opcional, máx. 3 imágenes)
+                </h3>
+                <p style="color: #888; font-size: 13px; margin-bottom: 20px;">
+                    Sube hasta 3 imágenes. Cada una puede tener un tema de color diferente que se activará cuando se muestre en el slider.
+                </p>
+                
+                <?php for ($i = 1; $i <= 3; $i++): 
+                    // Buscar si ya existe un slider para esta posición (sort_order = $i)
+                    $existingSlide = null;
+                    foreach ($event_sliders as $es) {
+                        if ($es['sort_order'] == $i) { $existingSlide = $es; break; }
+                    }
+                ?>
+                <div class="slider-upload-box">
+                    <h4>Imagen <?= $i ?></h4>
+                    <div class="form-row" style="margin-bottom: 0;">
+                        <div class="form-group">
+                            <label>Archivo de imagen</label>
+                            <input type="file" name="slider_image_<?= $i ?>" accept="image/*">
+                            <?php if ($existingSlide): ?>
+                                <img src="../<?= htmlspecialchars($existingSlide['image_url']) ?>" class="slider-preview" style="margin-top:10px;">
+                                <small style="color: #888;">Actual. Sube otro para reemplazar.</small>
+                            <?php endif; ?>
+                        </div>
+                        <div class="form-group">
+                            <label>Tema de colores para esta imagen</label>
+                            <select name="slider_theme_<?= $i ?>">
+                                <?php foreach ($themes as $theme): ?>
+                                    <option value="<?= $theme['id'] ?>" <?= ($existingSlide && $existingSlide['theme_id'] == $theme['id']) ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($theme['name']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <?php endfor; ?>
+            </div>
+            <!-- ============================================ -->
+            
+            <div class="checkbox-row" style="margin-top: 20px;">
                 <label class="featured-check">
                     <input type="checkbox" name="is_featured" <?= ($event['is_featured'] ?? 0) ? 'checked' : '' ?>>
                     <i class="fas fa-star" style="color:var(--admin-accent,#d4af37);"></i>
@@ -214,13 +334,15 @@ tr:hover{background:#222;}
                 </label>
             </div>
             
-            <button type="submit" class="btn btn-gold"><i class="fas fa-save"></i> <?= at('save') ?></button>
-            <a href="events.php" class="btn btn-gray"><?= at('cancel') ?></a>
+            <div style="margin-top: 20px;">
+                <button type="submit" class="btn btn-gold"><i class="fas fa-save"></i> <?= at('save') ?></button>
+                <a href="events.php" class="btn btn-gray"><?= at('cancel') ?></a>
+            </div>
         </form>
     </div>
     
     <?php else: ?>
-    <!-- LISTA DE EVENTOS -->
+    <!-- LISTA DE EVENTOS (Sin cambios respecto a tu código original) -->
     <div style="margin-bottom:20px;">
         <a href="?action=add" class="btn btn-gold"><i class="fas fa-plus"></i> <?= at('new_event') ?></a>
     </div>
@@ -239,40 +361,19 @@ tr:hover{background:#222;}
         <tbody>
         <?php foreach ($events as $e): ?>
         <tr>
-            <td>
-                <img src="../<?= htmlspecialchars($e['image_url']) ?>" 
-                     style="width:60px;height:60px;object-fit:cover;border-radius:6px;">
-            </td>
+            <td><img src="../<?= htmlspecialchars($e['image_url']) ?>" style="width:60px;height:60px;object-fit:cover;border-radius:6px;"></td>
             <td><?= htmlspecialchars($e['title']) ?></td>
             <td><?= date('M d, Y H:i', strtotime($e['event_date'])) ?></td>
             <td><?= format_currency($pdo, $e['price']) ?></td>
             <td>
-                <!-- ⭐ Toggle rápido de destacado -->
-                <a href="?toggle_featured=<?= $e['id'] ?>" 
-                   class="btn <?= $e['is_featured']?'btn-star':'btn-star-off' ?>" 
-                   style="padding:6px 12px;font-size:12px;" 
-                   title="<?= at('feature_this_event') ?>">
-                    <i class="fas fa-star"></i> 
-                    <?= $e['is_featured'] ? at('featured') : 'Regular' ?>
+                <a href="?toggle_featured=<?= $e['id'] ?>" class="btn <?= $e['is_featured']?'btn-star':'btn-star-off' ?>" style="padding:6px 12px;font-size:12px;">
+                    <i class="fas fa-star"></i> <?= $e['is_featured'] ? at('featured') : 'Regular' ?>
                 </a>
             </td>
+            <td><span class="badge <?= $e['is_active']?'badge-active':'badge-inactive' ?>"><?= $e['is_active'] ? at('active') : at('inactive') ?></span></td>
             <td>
-                <span class="badge <?= $e['is_active']?'badge-active':'badge-inactive' ?>">
-                    <?= $e['is_active'] ? at('active') : at('inactive') ?>
-                </span>
-            </td>
-            <td>
-                <a href="?action=edit&id=<?= $e['id'] ?>" 
-                   class="btn btn-gray" 
-                   style="padding:6px 12px;font-size:12px;">
-                    <i class="fas fa-edit"></i>
-                </a>
-                <a href="?delete=<?= $e['id'] ?>" 
-                   class="btn btn-danger" 
-                   style="padding:6px 12px;font-size:12px;" 
-                   onclick="return confirm('<?= at('confirm_delete') ?>')">
-                    <i class="fas fa-trash"></i>
-                </a>
+                <a href="?action=edit&id=<?= $e['id'] ?>" class="btn btn-gray" style="padding:6px 12px;font-size:12px;"><i class="fas fa-edit"></i></a>
+                <a href="?delete=<?= $e['id'] ?>" class="btn btn-danger" style="padding:6px 12px;font-size:12px;" onclick="return confirm('<?= at('confirm_delete') ?>')"><i class="fas fa-trash"></i></a>
             </td>
         </tr>
         <?php endforeach; ?>

@@ -1208,6 +1208,707 @@ html {
 
 
 
+
+/* ============================================
+   EVENT DETAIL PAGE - Diseño Premium (Colores Sólidos)
+   ============================================ */
+/* ============================================
+   HERO DEL EVENTO - CENTRADO (Reemplaza estas reglas)
+   ============================================ */
+
+.event-hero-premium {
+    position: relative;
+    background-color: var(--color-black);
+    background-size: cover;
+    background-position: center;
+    padding: 80px 0 60px;
+    margin-bottom: 0;
+    /*border-bottom: 3px solid var(--color-gold);*/
+    text-align: center; /* ✅ Centra badge, título y lineup */
+}
+
+.event-hero-premium::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(10, 10, 10, 0.92);
+}
+
+.event-hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 1000px; /* ✅ Limita el ancho */
+    margin: 0 auto;    /* ✅ Centra el bloque */
+}
+
+.event-hero-badge {
+    display: inline-block;
+    background-color: var(--color-gold);
+    color: var(--color-black);
+    padding: 8px 20px;
+    border-radius: 25px;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+}
+
+.event-hero-title {
+    font-size: 72px; /* ✅ Un poco más grande para impacto centrado */
+    font-weight: 800;
+    color: var(--color-white);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    line-height: 1;
+    text-shadow: 3px 3px 15px rgba(0, 0, 0, 0.7);
+}
+
+.event-hero-lineup {
+    font-size: 18px;
+    color: var(--color-gold);
+    margin-bottom: 40px;
+    font-weight: 300;
+    letter-spacing: 1px;
+}
+
+.event-hero-meta {
+    display: flex;
+    justify-content: center; /* ✅ Centra los 3 bloques horizontalmente */
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+.hero-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: var(--color-dark-gray);
+    padding: 15px 25px;
+    /*border-radius: 8px;
+    border-left: 3px solid var(--color-gold);*/
+    text-align: left; /* ✅ Texto interno a la izquierda para legibilidad */
+    min-width: 240px; /* ✅ Tamaño uniforme en los 3 bloques */
+}
+
+.meta-icon {
+    width: 45px;
+    height: 45px;
+    background-color: var(--color-gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-black);
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.meta-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.meta-label {
+    font-size: 11px;
+    color: var(--color-light-gray);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+}
+
+.meta-value {
+    font-size: 15px;
+    color: var(--color-white);
+    font-weight: 600;
+}
+
+
+/* SECCIONES DE CONTENIDO */
+.event-main-content {
+    padding: 80px 0;
+    background-color: var(--color-black);
+}
+
+.event-grid-layout {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 60px;
+    align-items: start;
+}
+
+/* TARJETAS DE CONTENIDO */
+.content-card {
+    background-color: var(--color-dark-gray);
+    border-radius: 15px;
+    padding: 35px;
+    margin-bottom: 30px;
+    border: 1px solid var(--color-gray);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    transition: all 0.4s ease;
+}
+
+.content-card:hover {
+    border-color: var(--color-gold);
+    box-shadow: 0 12px 40px rgba(212, 175, 55, 0.15);
+    transform: translateY(-3px);
+}
+
+.card-title {
+    font-size: 24px;
+    color: var(--color-gold);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 700;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--color-gray);
+}
+
+.card-title i {
+    font-size: 26px;
+    color: var(--color-gold);
+}
+
+.event-description-content {
+    color: var(--color-light-gray);
+    line-height: 2;
+    font-size: 16px;
+    font-weight: 300;
+}
+
+/* TARJETA DE UBICACIÓN */
+.location-card {
+    background-color: var(--color-gray);
+    border-color: var(--color-gold);
+}
+
+.location-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.location-name {
+    color: var(--color-white);
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+}
+
+.location-name i {
+    color: var(--color-gold);
+    font-size: 22px;
+}
+
+.btn-map {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background-color: transparent;
+    color: var(--color-gold);
+    border: 2px solid var(--color-gold);
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    width: fit-content;
+}
+
+.btn-map:hover {
+    background-color: var(--color-gold);
+    color: var(--color-black);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+}
+
+/* TARJETA DE TICKETS PREMIUM */
+.tickets-card-premium {
+    background-color: var(--color-dark-gray);
+    border-radius: 15px;
+    border: 2px solid var(--color-gold);
+    overflow: hidden;
+    position: sticky;
+    top: 100px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+}
+
+.tickets-header {
+    background-color: var(--color-gold);
+    color: var(--color-black);
+    padding: 25px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.tickets-header i {
+    font-size: 28px;
+}
+
+.tickets-header h2 {
+    font-size: 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 700;
+}
+
+.tickets-body {
+    padding: 30px;
+}
+
+.ticket-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: var(--color-black);
+    border-radius: 10px;
+    margin-bottom: 15px;
+    border-left: 4px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.ticket-row:hover {
+    border-left-color: var(--color-gold);
+    transform: translateX(8px);
+    background-color: var(--color-dark-gray);
+}
+
+.ticket-row.featured {
+    border-left-color: var(--color-gold);
+    background-color: var(--color-gray);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.ticket-details {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ticket-type {
+    color: var(--color-white);
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+}
+
+.ticket-availability {
+    color: var(--color-gold);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.ticket-availability i {
+    margin-right: 6px;
+}
+
+.ticket-purchase {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.ticket-cost {
+    color: var(--color-white);
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.btn-select {
+    background-color: var(--color-gold);
+    color: var(--color-black);
+    border: none;
+    padding: 10px 25px;
+    border-radius: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-select:hover {
+    background-color: var(--color-gold-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+}
+
+.tickets-footer {
+    background-color: var(--color-black);
+    padding: 18px 30px;
+    text-align: center;
+    color: var(--color-light-gray);
+    font-size: 13px;
+    border-top: 1px solid var(--color-gray);
+}
+
+.tickets-footer i {
+    color: var(--color-gold);
+    margin-right: 8px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+    .event-grid-layout {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    
+    .event-tickets-section {
+        order: -1;
+    }
+    
+    .tickets-card-premium {
+        position: static;
+    }
+    
+    .event-hero-title {
+        font-size: 48px;
+    }
+}
+
+@media (max-width: 768px) {
+    .event-hero-title {
+        font-size: 36px;
+    }
+    
+    .event-hero-lineup {
+        font-size: 16px;
+    }
+    
+    .hero-meta-item {
+        flex: 1 1 100%;
+    }
+    
+    .content-card {
+        padding: 25px;
+    }
+    
+    .card-title {
+        font-size: 20px;
+    }
+    
+    .ticket-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .ticket-purchase {
+        align-items: flex-start;
+        width: 100%;
+    }
+    
+    .btn-select {
+        width: 100%;
+    }
+    
+    .ticket-cost {
+        font-size: 20px;
+    }
+}
+
+/* ✅ Ajustes responsive para el Hero centrado */
+@media (max-width: 768px) {
+    .event-hero-title {
+        font-size: 42px;
+        letter-spacing: 2px;
+    }
+    
+    .event-hero-meta {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .hero-meta-item {
+        width: 100%;
+        max-width: 320px;
+        min-width: auto;
+    }
+}
+
+
+
+/* ============================================
+   SEARCH PAGE
+   ============================================ */
+.search-section {
+    background-color: var(--color-black) !important;
+    min-height: 500px;
+}
+
+.search-section .section-title {
+    margin-bottom: 30px;
+}
+
+
+
+/* ============================================
+   FIX: Input de búsqueda - Fondo blanco
+   ============================================ */
+
+   /* Forzar fondo transparente en el input de búsqueda */
+.search-bar input {
+    background-color: transparent !important;
+    -webkit-text-fill-color: var(--color-white) !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Fix para autofill de Chrome/Edge */
+.search-bar input:-webkit-autofill,
+.search-bar input:-webkit-autofill:hover,
+.search-bar input:-webkit-autofill:focus,
+.search-bar input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px var(--color-gray) inset !important;
+    -webkit-text-fill-color: var(--color-white) !important;
+    background-color: var(--color-gray) !important;
+    background-clip: padding-box;
+    border: 1px solid var(--color-gray);
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Estado focus */
+.search-bar input:focus {
+    background-color: var(--color-gray) !important;
+    outline: none;
+}
+
+
+
+
+
+/* ============================================
+   FIX: Footer Móvil - Logo y redes sociales centrados
+   ============================================ */
+@media (max-width: 768px) {
+    /* Primera sección del footer (logo + redes) */
+    .footer-section:first-child {
+        text-align: center !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        padding: 0 20px;
+    }
+    
+    /* Logo centrado */
+    .footer-section:first-child img {
+        margin: 0 auto 10px !important;
+        display: block !important;
+    }
+    
+    /* Tagline centrado */
+    .footer-section:first-child p {
+        text-align: center !important;
+        margin-bottom: 15px !important;
+        width: 100%;
+    }
+    
+    /* ✅ Iconos de redes sociales centrados */
+    .footer-social {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        gap: 15px !important;
+        margin: 15px auto 0 !important;
+        width: 100%;
+        flex-wrap: wrap;
+    }
+    
+    .social-icon {
+        width: 42px;
+        height: 42px;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        margin: 0 !important;
+    }
+    
+    .social-icon i {
+        margin: 0 !important;
+        line-height: 1;
+        font-size: 18px;
+    }
+}
+
+
+
+/* ============================================
+   OCULTAR ENLACES RÁPIDOS EN MÓVIL
+   ============================================ */
+@media (max-width: 768px) {
+    /* Oculta la segunda sección del footer (Enlaces Rápidos) */
+    .footer-container .footer-section:nth-child(2) {
+        display: none !important;
+    }
+}
+
+
+
+/* ============================================
+   FIX: Footer Móvil - Iconos alineados con texto
+   ============================================ */
+@media (max-width: 768px) {
+    /* Cada línea de contacto */
+    .footer-section:nth-child(3) p {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 10px !important;
+        margin-bottom: 15px !important;
+        text-align: center !important;
+    }
+    
+    /* Iconos de contacto */
+    .footer-section:nth-child(3) p i {
+        font-size: 16px;
+        flex-shrink: 0;
+        margin-right: 0 !important;
+        margin-bottom: 0 !important;
+        color: var(--color-gold);
+    }
+    
+    /* Texto de contacto */
+    .footer-section:nth-child(3) p a,
+    .footer-section:nth-child(3) p span {
+        font-size: 14px;
+    }
+}
+
+
+/* ============================================
+   LOADER CON IMAGEN Y PORCENTAJE - PROPORCIÓN CORRECTA
+   ============================================ */
+.page-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #0a0a0a !important;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.page-loader.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.loader-container {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Círculo giratorio */
+.loader-circle {
+    position: absolute;
+    width: 60%;
+    height: 60%;
+    border-radius: 50%;
+    border: 3px solid rgba(212, 175, 55, 0.15);
+    border-top-color: #d4af37 !important;
+    border-right-color: #d4af37 !important;
+    animation: loader-spin 1.2s linear infinite;
+    z-index: 1;
+}
+
+.loader-circle-inner {
+    display: none;
+}
+
+/* Imagen/Logo - SIN altura fija para mantener proporción */
+.loader-image {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: loader-pulse 2s ease-in-out infinite;
+}
+
+.loader-image img {
+    width: 30px; /* ✅ cambiar tamaño imagen del loader */
+    height: auto;
+    display: block;
+    filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.8));
+}
+
+/* Porcentaje de carga */
+.loader-percentage {
+    position: absolute;
+    bottom: -45px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 24px;
+    font-weight: 700;
+    color: #d4af37 !important;
+    letter-spacing: 2px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    z-index: 3;
+}
+
+@keyframes loader-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes loader-pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.9;
+        transform: scale(0.98);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .loader-container {
+        width: 140px;
+        height: 140px;
+    }
+    
+    .loader-image img {
+        width: 25px; /* ✅ cambiar tamaño imagen  LOADER */
+    }
+    
+    .loader-percentage {
+        font-size: 20px;
+        bottom: -40px;
+    }
+}
+
+
+
 /* ============================================
 ADMIN THEME COLORS (CSS Variables for Admin Panel)
 ============================================ */

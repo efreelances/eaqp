@@ -107,4 +107,27 @@ return [
     'status' => 'Estado',
     'active' => 'Activo',
     'inactive' => 'Inactivo',
+
+
+    'artists_tbc' => 'Artistas por confirmar',
+    'location' => 'Lugar',
+    'date' => 'Fecha',
+    'time' => 'Hora',
+    'about_event' => 'Detalles del Evento',
+    'view_map' => 'Ver en Mapa',
+    'ticket_prices' => 'Tabla de Precios',
+    'select' => 'Seleccionar',
+    'sale_starts' => 'Venta a partir del',
+    'upcoming_events' => 'Próximos Eventos',
+    'tickets_from' => 'Entradas desde',
+    'know_more' => 'Conoce más',
+
+    'search_results' => 'Resultados de búsqueda',
+    'searching_for' => 'Buscando',
+    'no_results' => 'No se encontraron resultados',
+    'try_different_search' => 'Intenta con otro término de búsqueda',
+    'back_home' => 'Volver al inicio',
+    'enter_search_term' => 'Ingresa un término de búsqueda',
+    'use_search_bar' => 'Usa la barra de búsqueda del menú para encontrar eventos',
+
 ];

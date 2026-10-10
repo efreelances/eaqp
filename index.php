@@ -46,6 +46,7 @@ foreach ($all_themes as $theme) {
 $stmt_featured = $pdo->query("SELECT * FROM events WHERE is_featured = 1 AND is_active = 1 ORDER BY event_date ASC LIMIT 8");
 $featured_events = $stmt_featured->fetchAll(PDO::FETCH_ASSOC);
 
+
 // 🤖 APLICAR TRADUCCIÓN AUTOMÁTICA A EVENTOS DESTACADOS (Si el idioma es inglés)
 if ($current_lang === 'en') {
     foreach ($featured_events as &$event) {
@@ -133,14 +134,17 @@ FEATURED EVENTS
             <?php foreach ($featured_events as $event): ?>
             <div class="event-card">
                 <div class="event-image">
-                    <img src="<?php echo htmlspecialchars($event['image_url']); ?>" alt="<?php echo htmlspecialchars($event['title']); ?>">
+                    <a href="events.php?id=<?= $event['id'] ?>">
+                        <img src="<?php echo htmlspecialchars($event['image_url']); ?>" alt="<?php echo htmlspecialchars($event['title']); ?>">
+                    </a>
+
                     <span class="event-price"><?php echo format_currency($pdo, $event['price']); ?></span>
                 </div>
                 <div class="event-details">
                     <h3><?php echo htmlspecialchars($event['title']); ?></h3>
                     <p class="event-date"><i class="far fa-calendar-alt"></i> <?php echo date('M d, Y', strtotime($event['event_date'])); ?></p>
                     <p class="event-desc"><?php echo htmlspecialchars(substr($event['description'], 0, 80)); ?>...</p>
-                    <button class="btn-outline"><?= t('view_details') ?></button>
+                    <a href="events.php?id=<?php echo $event['id']; ?>" class="btn-outline"><?= t('view_details') ?></a>
                 </div>
             </div>
             <?php endforeach; ?>
